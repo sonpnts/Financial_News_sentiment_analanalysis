@@ -15,7 +15,10 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ item.title }}</h5>
                             <p class="card-text"><small class="text-muted">{{ item.pubDate }}</small></p>
-                            <a href="{{ url_for('analyze_article', title=item.title, link=item.link) }}" class="btn btn-primary">Phân tích bài viết</a>
+{#                            <p>{{ item }}</p>#}
+{#                            <a href="{{ url_for('analyze_article', title=item.title, link=item.link) }}" class="btn btn-primary">Phân tích bài viết</a>#}
+                            <button class="btn btn-primary" onclick='analyzeArticle({{ item | tojson | safe }})'>Phân tích bài viết</button>
+
                         </div>
                     </div>
                 </div>
@@ -26,5 +29,24 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        function analyzeArticle(item) {
+            fetch('/analyze_article', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(item)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Chuyển hướng đến trang phân tích với dữ liệu nhận được
+                window.location.href = '/analysis?title=' + encodeURIComponent(data.title) + '&link=' + encodeURIComponent(data.link) + '&prediction=' + encodeURIComponent(JSON.stringify(data.prediction));
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+
 </body>
 </html>

@@ -1,11 +1,16 @@
-from flask import Flask, render_template, request
+import json
+import urllib
+
+
+from flask import Flask, render_template, request, jsonify
 import requests
 from bs4 import BeautifulSoup
 import torch
 import torch.nn.functional as F
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from googletrans import Translator
-
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
 
 app = Flask(__name__)
 
@@ -14,6 +19,17 @@ app = Flask(__name__)
 model = AutoModelForSequenceClassification.from_pretrained('sentiment_analysis_accu-81')
 tokenizer = AutoTokenizer.from_pretrained('sentiment_analysis_accu-81')
 
+username = urllib.parse.quote_plus('son')
+password = urllib.parse.quote_plus('lij2UqPtF0RQ7anx')
+
+# Tạo URI kết nối MongoDB với thông tin mã hóa
+uri = f"mongodb+srv://{username}:{password}@sonpnts.akwoo40.mongodb.net/?retryWrites=true&w=majority&appName=sonpnts"
+# uri = f"mongodb+srv://sonpnts:Son1010@@sonpnts.akwoo40.mongodb.net/?retryWrites=true&w=majority&appName=sonpnts"
+
+client = MongoClient(uri, server_api=ServerApi('1'))
+
+db = client['sentiment_analysis']
+collection = db['news']
 
 def translate_text(text):
     translator = Translator()
@@ -62,11 +78,32 @@ def load_rss():
     news_items = fetch_news()
     return render_template('rss.html', news_items=news_items)
 
-@app.route('/analyze_article')
+@app.route('/analyze_article', methods=['POST'])
 def analyze_article():
+    item = request.get_json()
+    title = item['title']
+    link = item['link']
+    prediction = processing(title)
+    document = {
+        'title': title,
+        'link': link,
+        'prediction': prediction,
+        'pubDate': item['pubDate'],
+        'positive': prediction['positive'],
+        'negative': prediction['negative'],
+        'neutral': prediction['neutral']
+    }
+
+    # Lưu tài liệu vào MongoDB
+    collection.insert_one(document)
+    return jsonify({'title': title, 'link': link, 'prediction': prediction})
+
+@app.route('/analysis')
+def analysis():
     title = request.args.get('title')
     link = request.args.get('link')
-    prediction = processing(title)
+    prediction_url = request.args.get('prediction')
+    prediction = json.loads(prediction_url) if prediction_url else {}
     translated_title = translate_text(title)
     return render_template('analysis.html', title=title,titlevn=translated_title, prediction=prediction, link=link)
 
