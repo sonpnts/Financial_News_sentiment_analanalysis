@@ -10,9 +10,9 @@ from googletrans import Translator
 app = Flask(__name__)
 
 # Khởi tạo mô hình và tokenizer
-model_name = "ProsusAI/finbert"
-model = AutoModelForSequenceClassification.from_pretrained(model_name)
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+# model_name = "ProsusAI/finbert"
+model = AutoModelForSequenceClassification.from_pretrained('sentiment_analysis_accu-81')
+tokenizer = AutoTokenizer.from_pretrained('sentiment_analysis_accu-81')
 
 
 def translate_text(text):
@@ -20,7 +20,7 @@ def translate_text(text):
     translated = translator.translate(text, src='en', dest='vi')
     return translated.text
 def fetch_news():
-    url = 'https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en'
+    url = 'https://news.google.com/rss/search?q=finance&hl=en-US&gl=US&ceid=US:en'
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'xml')
     articles = soup.find_all('item')
@@ -47,9 +47,9 @@ def predict(text):
         outputs = model(**inputs)
     probabilities = F.softmax(outputs.logits, dim=-1).tolist()
     return {
-        "positive": probabilities[0][0],
-        "negative": probabilities[0][1],
-        "neutral": probabilities[0][2]
+        "positive": probabilities[0][2],
+        "negative": probabilities[0][0],
+        "neutral": probabilities[0][1]
     }
 
 def processing(input_text):
