@@ -6,7 +6,7 @@ This is a simple Flask application.
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/my_flask_app.git
+    git clone https://github.com/sonpnts/Financial_News_sentiment_analanalysis.git
     cd my_flask_app
     ```
 
