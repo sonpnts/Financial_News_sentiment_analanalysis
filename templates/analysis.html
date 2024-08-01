@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Phân tích bài viết</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">{{ title }}</h1>
+        <h3 class="mb-4"><em>{{ titlevn }}</em></h3>
+
+
+        <div class="mb-4">
+            <a href="{{ link }}" target="_blank" class="btn btn-secondary">Xem bài báo gốc</a>
+        </div>
+
+        <h2>Kết quả phân tích:</h2>
+
+        <div class="progress mb-3">
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ prediction.positive * 100 }}%;" aria-valuenow="{{ prediction.positive * 100 }}" aria-valuemin="0" aria-valuemax="100">
+                Positive: {{ prediction.positive | round(2) }}
+            </div>
+        </div>
+
+        <div class="progress mb-3">
+            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ prediction.negative * 100 }}%;" aria-valuenow="{{ prediction.negative * 100 }}" aria-valuemin="0" aria-valuemax="100">
+                Negative: {{ prediction.negative | round(2) }}
+            </div>
+        </div>
+
+        <div class="progress mb-3">
+            <div class="progress-bar bg-info" role="progressbar" style="width: {{ prediction.neutral * 100 }}%;" aria-valuenow="{{ prediction.neutral * 100 }}" aria-valuemin="0" aria-valuemax="100">
+                Neutral: {{ prediction.neutral | round(2) }}
+            </div>
+        </div>
+
+        <h5 class="mt-4">Ghi chú:</h5>
+        <p>Đây là các giá trị phân tích cảm xúc của bài viết. Bạn có thể dựa vào các giá trị này để đánh giá tâm trạng chung của bài viết.</p>
+
+        <a href="{{ url_for('load_rss') }}" class="btn btn-primary">Quay lại</a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
