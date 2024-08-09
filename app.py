@@ -1,7 +1,5 @@
 import json
 import urllib
-
-
 from flask import Flask, render_template, request, jsonify
 import requests
 from bs4 import BeautifulSoup
@@ -106,6 +104,37 @@ def analysis():
     prediction = json.loads(prediction_url) if prediction_url else {}
     translated_title = translate_text(title)
     return render_template('analysis.html', title=title,titlevn=translated_title, prediction=prediction, link=link)
+
+@app.route('/analyze_url', methods=['POST'])
+def analyze_url():
+    item = request.get_json()
+    url = item['url']
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+    response = requests.get(url, headers=headers)
+
+    # Fetch and process the content from the URL
+    # response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    title = soup.title.string if soup.title else 'No title found'
+    content = soup.get_text()
+
+    # Analyze the content
+    prediction = processing(content)
+    # document = {
+    #     'title': title,
+    #     'link': url,
+    #     'prediction': prediction,
+    #     'positive': prediction['positive'],
+    #     'negative': prediction['negative'],
+    #     'neutral': prediction['neutral']
+    # }
+    #
+    # # Save to MongoDB
+    # collection.insert_one(document)
+    print(title, url, prediction)
+    return jsonify({'title': title, 'link': url, 'prediction': prediction})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
