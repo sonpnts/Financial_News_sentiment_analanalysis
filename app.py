@@ -9,7 +9,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from googletrans import Translator
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-
+import re
 app = Flask(__name__)
 
 # Khởi tạo mô hình và tokenizer
@@ -50,11 +50,21 @@ def fetch_news():
 
     return news_items
 
-def clean_text(sentence):
-    words = sentence.split()
-    mytokens = [word for word in words]
-    return ' '.join(mytokens).strip()
+# def clean_text(sentence):
+#     words = sentence.split()
+#     mytokens = [word for word in words]
+#     return ' '.join(mytokens).strip()
 
+
+
+def clean_text(sentence):
+    # # Parse HTML and extract plain text
+    soup = BeautifulSoup(sentence+'<html>', "html.parser")
+    sentence = re.sub(r'\[[^]]*\]', '', soup.get_text())
+
+    # # # Remove links
+    sentence = re.sub(r'http\S+|www\S+|https\S+', '', sentence, flags=re.MULTILINE)
+    return sentence
 def predict(text):
     inputs = tokenizer(text, return_tensors='pt', truncation=True, padding=True, max_length=128)
     with torch.no_grad():
