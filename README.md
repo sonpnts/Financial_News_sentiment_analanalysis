@@ -1,3 +1,9 @@
+# FINANCIAL AND E-COMMERCE DATA ANALYSIS
+
+## Analyze the painful economic situation based on articles
+
+
+
 # My Flask App
 
 This is a simple Flask application.
